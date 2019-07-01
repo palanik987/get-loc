@@ -25,7 +25,7 @@ function getLocation() {
 
         // call getCurrentPosition()
         navigator.geolocation.getCurrentPosition(success, error, options);
-        
+
         // Converts numeric degrees to radians
         function toRad(Value) {
             return Value * Math.PI / 180;
@@ -45,18 +45,48 @@ function getLocation() {
             return d;
         }
 
-        function buildTicket(data,lat,lng){
+        function buildTicket(data, lat, lng) {
             var songkickTickets = document.createElement('div');
             songkickTickets.className = "total-wrapper";
+            var totalDates=0;
             for (var i = 0; i < data.length; i++) {
-                if(calcCrow(lat,lng,data[i].event.location.lat,data[i].event.location.lng).toFixed(1) <= 15000){
+                if (calcCrow(lat, lng, data[i].event.location.lat, data[i].event.location.lng).toFixed(1) <= 15000) {
                     var ticket = document.createElement('div');
                     ticket.className = "ticket-wrapper"
-                    ticket.innerHTML = data[i].event.start.date +"---"+data[i].event.venue.displayName;
+                    var firstWrapper = document.createElement('div');
+                    firstWrapper.className = 'details';
+                    var secondWrapper = document.createElement('div');
+                    secondWrapper.className = 'link';
+
+                    var date = document.createElement('div');
+                    date.className = "date";
+                    date.innerHTML = data[i].event.start.date;
+                    firstWrapper.appendChild(date);
+
+                    var place = document.createElement("div");
+                    place.className = "place";
+                    place.innerHTML = data[i].event.location.city;
+                    firstWrapper.appendChild(place);
+                    //first wrapper over
+
+                    var link = document.createElement('a');
+                    link.href = data[i].event.uri;
+                    link.innerHTML = "Tickets";
+                    secondWrapper.appendChild(link);
+                    //second wrapper over
+                    
+                    ticket.appendChild(firstWrapper);
+                    ticket.appendChild(secondWrapper);
                     songkickTickets.appendChild(ticket);
-                }    
+                    totalDates++;
+                }
             }
-            jQuery('body').append(songkickTickets);
+            if(totalDates !=0){
+                jQuery('.tickets').append(songkickTickets);
+                jQuery('.tickets').show();
+            }else{
+                jQuery('.no-tickets').show();
+            }
         }
         // upon success, do this
         function success(pos) {
@@ -74,7 +104,7 @@ function getLocation() {
                 if (this.readyState == 4 && this.status == 200) {
                     data = JSON.parse(this.responseText).resultsPage.results;
                     totalEntries = JSON.parse(this.responseText).resultsPage.totalEntries;
-                    buildTicket(data.performance,lat,lng);
+                    buildTicket(data.performance, lat, lng);
                 }
             };
             xmlhttp.open("GET", url, true);
@@ -85,12 +115,25 @@ function getLocation() {
         function error(err) {
             return msg = err;
         }
-    } // end requestLocation();
+    }
 
-} // end getLocation()
+}
 
 // attach getLocation() to button click
+var clicked = false;
 jQuery('.check-button').on('click', function () {
     // show spinner while getlocation() does its thing
-    console.info(getLocation());
+    if(jQuery('span.icon-location2').is(":visible")){
+        jQuery('span.icon-location2').hide();
+        jQuery('span.icon-cross').show();
+        jQuery('.popup').show();
+    }else{
+        jQuery('span.icon-cross').hide();
+        jQuery('.popup').hide();
+        jQuery('span.icon-location2').show();
+    }
+    if(!clicked){
+        clicked = !clicked;
+        getLocation();
+    }
 });
