@@ -48,9 +48,9 @@ function getLocation() {
         function buildTicket(data, lat, lng) {
             var songkickTickets = document.createElement('div');
             songkickTickets.className = "total-wrapper";
-            var totalDates=0;
+            var totalDates = 0;
             for (var i = 0; i < data.length; i++) {
-                if (calcCrow(lat, lng, data[i].event.location.lat, data[i].event.location.lng).toFixed(1) <= 15000) {
+                if (calcCrow(lat, lng, data[i].event.location.lat, data[i].event.location.lng).toFixed(1) <= 150) {
                     var ticket = document.createElement('div');
                     ticket.className = "ticket-wrapper"
                     var firstWrapper = document.createElement('div');
@@ -74,17 +74,17 @@ function getLocation() {
                     link.innerHTML = "Tickets";
                     secondWrapper.appendChild(link);
                     //second wrapper over
-                    
+
                     ticket.appendChild(firstWrapper);
                     ticket.appendChild(secondWrapper);
                     songkickTickets.appendChild(ticket);
                     totalDates++;
                 }
             }
-            if(totalDates !=0){
+            if (totalDates != 0) {
                 jQuery('.tickets').append(songkickTickets);
                 jQuery('.tickets').show();
-            }else{
+            } else {
                 jQuery('.no-tickets').show();
             }
         }
@@ -123,17 +123,63 @@ function getLocation() {
 var clicked = false;
 jQuery('.check-button').on('click', function () {
     // show spinner while getlocation() does its thing
-    if(jQuery('span.icon-location2').is(":visible")){
+    if (jQuery('span.icon-location2').is(":visible")) {
         jQuery('span.icon-location2').hide();
         jQuery('span.icon-cross').show();
         jQuery('.popup').show();
-    }else{
+    } else {
         jQuery('span.icon-cross').hide();
         jQuery('.popup').hide();
         jQuery('span.icon-location2').show();
     }
-    if(!clicked){
+    if (!clicked) {
         clicked = !clicked;
         getLocation();
+    }
+});
+
+var getJSON = function (url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function () {
+        var status = xhr.status;
+        if (status == 200) {
+            callback(null, xhr.response);
+        } else {
+            callback(status);
+        }
+    };
+    xhr.send();
+};
+document.querySelector("#submit").addEventListener("click", function () {
+    var email = document.querySelector("#email").value;
+    var isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    var autoreply = document.querySelector("#autoreply").value;
+    var datasource = document.querySelector("#Datasource").value;
+    var newsletterId = document.querySelector("#mainListID").value;
+    var triggerId = document.querySelector("#triggerId").value;
+    var dataext = document.querySelector("#dataext").value;
+    var mailinglistParams = document.querySelector("#mailinglistParams").value;
+
+    var url = "https://signup.wmg.com/register?email=" + email + "&newsletterId=" + newsletterId;
+
+    if (isEmailValid) {
+        alert(isEmailValid);
+
+        document.querySelector(".email span#error").style.display = "none";
+        getJSON(url, function (err, data) {
+            if (err != null) {
+                console.error(err);
+            } else {
+                console.info(data);
+                console.info("success");
+                document.querySelector("#mlform").style.display = "none";
+                document.querySelector("#thankyou").style.display = "block";
+            }
+        });
+    }
+    else {
+        document.querySelector(".email span#error").style.display = "block";
     }
 });
