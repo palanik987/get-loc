@@ -50,7 +50,7 @@ function getLocation() {
             songkickTickets.className = "total-wrapper";
             var totalDates = 0;
             for (var i = 0; i < data.length; i++) {
-                if (calcCrow(lat, lng, data[i].event.location.lat, data[i].event.location.lng).toFixed(1) <= 150) {
+                if (calcCrow(lat, lng, data[i].event.location.lat, data[i].event.location.lng).toFixed(1) <= 500) {
                     var ticket = document.createElement('div');
                     ticket.className = "ticket-wrapper"
                     var firstWrapper = document.createElement('div');
